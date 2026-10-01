@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="theme-color" content="#173f37">
+	<title>جدولي | خطتك الدراسية</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--ink: #1e302b;
+			--muted: #77827c;
+			--line: #e6eae5;
+			--paper: #f5f7f2;
+			--white: #fff;
+			--green: #173f37;
+			--green-soft: #e8f2ec;
+			--lime: #d8ed87;
+			--coral: #e7775f;
+			--shadow: 0 12px 36px rgba(32, 55, 45, .07);
+		}
+		* { box-sizing: border-box; }
+		body { margin: 0; background: var(--paper); color: var(--ink); font-family: 'Tajawal', sans-serif; }
+		button, input, select { font: inherit; }
+		button { cursor: pointer; }
+		.app-shell { min-height: 100vh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
+		.sidebar { background: #fff; border-left: 1px solid var(--line); padding: 28px 20px; display: flex; flex-direction: column; gap: 34px; }
+		.brand { display: flex; align-items: center; gap: 11px; font-size: 22px; font-weight: 800; }
+		.brand-mark { width: 38px; height: 38px; border-radius: 12px 12px 12px 4px; background: var(--green); color: var(--lime); display: grid; place-items: center; font-size: 23px; }
+		.side-label { color: #9aa49e; font-size: 12px; font-weight: 700; margin: 0 10px 10px; }
+		.nav-link { width: 100%; padding: 12px 13px; display: flex; gap: 11px; align-items: center; background: transparent; border: 0; border-radius: 10px; color: #65716b; text-align: right; font-weight: 600; }
+		.nav-link.active { background: var(--green-soft); color: var(--green); }
+		.nav-dot { width: 8px; height: 8px; border: 2px solid currentColor; border-radius: 3px; display: inline-block; }
+		.sidebar-bottom { margin-top: auto; }
+		.profile { border-top: 1px solid var(--line); padding: 18px 2px 0; display: flex; align-items: center; gap: 10px; }
+		.avatar { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: #f4d8cb; color: #754739; font-weight: 800; }
+		.profile-name { font-size: 14px; font-weight: 700; }
+		.profile-note { color: var(--muted); font-size: 12px; }
+		.logout { margin-right: auto; border: 0; color: var(--muted); background: none; padding: 8px; }
+		main { width: 100%; max-width: 1600px; margin: auto; padding: 32px clamp(20px, 4vw, 60px) 60px; }
+		.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 30px; }
+		.eyebrow { color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+		h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.25; font-weight: 800; }
+		.top-actions { display: flex; align-items: center; gap: 10px; }
+		.icon-button { border: 1px solid var(--line); background: white; color: var(--green); border-radius: 10px; min-height: 43px; padding: 0 14px; font-weight: 700; }
+		.primary-button { border: 0; background: var(--green); color: #fff; min-height: 45px; padding: 0 19px; border-radius: 10px; font-weight: 700; transition: transform .18s, background .18s; }
+		.primary-button:hover { background: #24584d; transform: translateY(-1px); }
+		.welcome-strip { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, .8fr); gap: 16px; margin-bottom: 18px; }
+		.focus-card { min-height: 195px; padding: 25px 28px; border-radius: 14px; color: white; background: var(--green); position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
+		.focus-card::after { content: ''; position: absolute; left: -35px; bottom: -85px; width: 240px; height: 240px; border: 1px solid rgba(216,237,135,.24); border-radius: 50%; box-shadow: 0 0 0 25px rgba(216,237,135,.04), 0 0 0 55px rgba(216,237,135,.035); }
+		.focus-label { color: #c4d5ce; font-size: 14px; font-weight: 600; }
+		.focus-title { font-size: 25px; font-weight: 800; margin: 7px 0 4px; }
+		.focus-meta { color: #d0ded8; font-size: 14px; }
+		.focus-bottom { display: flex; justify-content: space-between; align-items: center; z-index: 1; }
+		.countdown { background: var(--lime); color: var(--green); font-weight: 800; border-radius: 7px; padding: 7px 12px; direction: rtl; }
+		.focus-empty { color: white; opacity: .9; font-size: 15px; }
+		.date-card { border: 1px solid var(--line); background: #fff; border-radius: 14px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; }
+		.date-card-label { color: var(--muted); font-weight: 600; }
+		.big-date { font-size: 31px; font-weight: 800; margin: 8px 0 0; }
+		.date-sub { color: var(--muted); font-size: 14px; }
+		.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; margin-bottom: 34px; }
+		.stat { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 15px 18px; display: flex; justify-content: space-between; align-items: center; }
+		.stat-label { color: var(--muted); font-size: 13px; font-weight: 600; }
+		.stat-value { font-size: 23px; font-weight: 800; color: var(--green); }
+		.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+		.section-heading h2 { font-size: 21px; margin: 0; font-weight: 800; }
+		.section-heading p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+		.week-grid { display: grid; grid-template-columns: repeat(7, minmax(132px, 1fr)); gap: 10px; overflow-x: auto; padding: 2px 1px 12px; scrollbar-color: #bac9bf transparent; }
+		.day-column { min-height: 190px; padding: 13px 11px; border-radius: 11px; background: rgba(255,255,255,.72); border: 1px solid var(--line); transition: border-color .18s, background .18s; }
+		.day-column.selected { background: #fff; border-color: #83a997; box-shadow: 0 4px 16px rgba(32,55,45,.06); }
+		.day-column.today .day-name::after { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--coral); border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+		.day-column-head { display: flex; justify-content: space-between; align-items: center; padding: 0 1px 10px; border-bottom: 1px solid var(--line); }
+		.day-name { font-size: 14px; font-weight: 800; }
+		.day-count { color: #98a39d; font-size: 11px; }
+		.lesson-chip { display: block; width: 100%; text-align: right; border: 0; border-right: 3px solid var(--chip, #77a88e); background: #f1f6f2; border-radius: 5px; margin-top: 9px; padding: 8px 8px; color: var(--ink); }
+		.lesson-chip strong { display: block; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+		.lesson-chip span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; direction: rtl; }
+		.empty-day { text-align: center; padding: 25px 0; color: #a2aca6; font-size: 12px; }
+		.today-section { margin-top: 21px; }
+		.lesson-list { display: grid; gap: 10px; }
+		.lesson-row { display: grid; grid-template-columns: 94px minmax(0, 1fr) auto; gap: 14px; align-items: center; background: white; border: 1px solid var(--line); padding: 14px 17px; border-radius: 10px; }
+		.lesson-time { color: var(--green); font-weight: 800; font-size: 14px; direction: rtl; }
+		.lesson-main { border-right: 3px solid var(--row-color, #77a88e); padding-right: 11px; min-width: 0; }
+		.lesson-title { font-size: 16px; font-weight: 800; }
+		.lesson-subtitle { color: var(--muted); font-size: 12px; margin-top: 3px; }
+		.lesson-status { color: #738079; background: #f0f3ef; border-radius: 6px; padding: 5px 9px; font-size: 12px; white-space: nowrap; }
+		.lesson-status.done { color: #2f7052; background: #e7f4ea; }
+		.lesson-actions { display: flex; align-items: center; justify-content: flex-start; gap: 8px; }
+		.finish-button { border: 0; background: var(--green-soft); color: var(--green); border-radius: 8px; padding: 9px 12px; font-size: 13px; font-weight: 700; white-space: nowrap; }
+		.finish-button:disabled { background: #eaf2eb; color: #61806c; cursor: default; }
+		.empty-state { text-align: center; padding: 28px 14px; border: 1px dashed #d6dfd7; border-radius: 10px; color: var(--muted); background: rgba(255,255,255,.45); }
+		.homework-section { margin-top: 36px; }
+		.homework-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+		.homework-item { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; }
+		.task-mark { width: 9px; height: 9px; border-radius: 50%; background: #e4a45c; flex: 0 0 auto; }
+		.homework-item.done .task-mark { background: #5e9a70; }
+		.task-copy { min-width: 0; flex: 1; }
+		.task-copy strong { display: block; font-size: 14px; }
+		.task-copy span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+		.task-timer { color: var(--green); direction: rtl; font-weight: 800; font-variant-numeric: tabular-nums; }
+		.task-complete { border: 0; background: transparent; color: var(--green); font-size: 12px; font-weight: 700; padding: 7px; }
+		.overlay { position: fixed; inset: 0; padding: 18px; background: rgba(22, 38, 32, .48); display: grid; place-items: center; z-index: 10; animation: fade-in .18s ease-out; }
+		.modal { width: min(100%, 450px); background: #fff; padding: 25px; border-radius: 15px; box-shadow: var(--shadow); animation: lift-in .2s ease-out; }
+		.modal h2 { margin: 0 0 6px; font-size: 23px; }
+		.modal p { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+		.field { display: grid; gap: 7px; margin: 14px 0; }
+		.field label { font-size: 13px; font-weight: 700; }
+		.field input, .field select { width: 100%; border: 1px solid #dfe5df; background: #fff; border-radius: 8px; padding: 11px 12px; color: var(--ink); outline: none; }
+		.field input:focus, .field select:focus { border-color: #76a18c; box-shadow: 0 0 0 3px #e8f2ec; }
+		.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+		.modal-actions { display: flex; gap: 9px; margin-top: 21px; }
+		.modal-actions > button { flex: 1; }
+		.secondary-button { border: 1px solid var(--line); border-radius: 9px; background: white; color: var(--ink); font-weight: 700; }
+		.toast { position: fixed; bottom: 22px; left: 22px; z-index: 20; background: #203b31; color: white; padding: 13px 18px; border-radius: 9px; box-shadow: var(--shadow); font-weight: 600; animation: lift-in .2s ease-out; }
+		.celebrate { text-align: center; padding: 5px 0 0; }
+		.celebrate-mark { margin: 0 auto 12px; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center; color: #285740; background: var(--lime); font-size: 31px; animation: pop .4s cubic-bezier(.2,1.5,.5,1); }
+		.celebrate h2 { margin-bottom: 6px; }
+		.reminder { position: fixed; bottom: 20px; right: 20px; z-index: 8; display: none; align-items: center; gap: 12px; max-width: min(430px, calc(100vw - 40px)); padding: 15px 18px; background: #fff; border: 1px solid #e5c27e; border-right: 4px solid #e0a644; border-radius: 10px; box-shadow: var(--shadow); }
+		.reminder.show { display: flex; animation: lift-in .25s ease-out; }
+		.reminder strong { display: block; }
+		.reminder span { color: var(--muted); font-size: 13px; }
+		@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+		@keyframes lift-in { from { transform: translateY(8px); opacity: .5; } to { transform: translateY(0); opacity: 1; } }
+		@keyframes pop { 0% { transform: scale(.6) rotate(-12deg); } 100% { transform: scale(1) rotate(0); } }
+		@media (max-width: 1050px) { .app-shell { grid-template-columns: 205px minmax(0,1fr); } .sidebar { padding-inline: 15px; } .week-grid { grid-template-columns: repeat(7, minmax(125px,1fr)); } }
+		@media (max-width: 760px) {
+			.app-shell { display: block; padding-bottom: 62px; }
+			.sidebar { position: fixed; z-index: 5; bottom: 0; right: 0; left: 0; height: 58px; padding: 5px 10px; border: 0; border-top: 1px solid var(--line); display: flex; flex-direction: row; justify-content: center; gap: 10px; }
+			.brand, .sidebar > div:first-of-type, .sidebar-bottom { display: none; }
+			.sidebar nav { display: flex; width: 100%; justify-content: space-around; }
+			.side-label { display: none; }
+			.nav-link { width: auto; justify-content: center; padding: 9px 14px; font-size: 13px; }
+			main { padding: 22px 16px 42px; }
+			.topbar { align-items: start; margin-bottom: 22px; }
+			.top-actions { flex-shrink: 0; }
+			.icon-button { width: 43px; padding: 0; font-size: 0; }
+			.icon-button::before { content: '◉'; font-size: 17px; }
+			.primary-button { padding-inline: 13px; font-size: 13px; }
+			.welcome-strip { grid-template-columns: 1fr; }
+			.focus-card { min-height: 174px; padding: 20px; }
+			.date-card { padding: 16px 20px; flex-direction: row; align-items: center; }
+			.big-date { font-size: 24px; }
+			.stats { gap: 7px; }
+			.stat { padding: 11px 9px; align-items: start; flex-direction: column; gap: 5px; }
+			.stat-label { font-size: 11px; }
+			.stat-value { font-size: 21px; }
+			.week-grid { display: flex; flex-direction: column; overflow: visible; padding: 0; }
+			.day-column { display: none; min-height: unset; padding: 12px; }
+			.day-column.selected { display: block; }
+			.day-column-head { padding-bottom: 3px; border: 0; }
+			.lesson-chip { display: none; }
+			.day-picker { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 9px; padding-bottom: 5px; }
+			.day-pick { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 8px; background: white; padding: 8px 11px; color: var(--muted); font-size: 12px; }
+			.day-pick.active { color: white; background: var(--green); border-color: var(--green); }
+			.lesson-row { grid-template-columns: 67px minmax(0,1fr); gap: 9px; padding: 12px; }
+			.lesson-actions { grid-column: 2; flex-wrap: wrap; }
+			.lesson-title { font-size: 14px; }
+			.homework-list { grid-template-columns: 1fr; }
+			.section-heading h2 { font-size: 19px; }
+		}
+		@media (min-width: 761px) { .day-picker { display: none; } }
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+	</style>
+</head>
+<body>
+	<div class="app-shell">
+		<aside class="sidebar">
+			<div class="brand"><span class="brand-mark">ج</span><span>جدولي</span></div>
+			<div>
+				<p class="side-label">القائمة</p>
+				<nav aria-label="التنقل الرئيسي">
+					<button class="nav-link active" type="button"><span class="nav-dot"></span>جدولي الدراسي</button>
+					<button class="nav-link" type="button" id="homework-nav"><span class="nav-dot"></span>الواجبات</button>
+				</nav>
+			</div>
+			<div class="sidebar-bottom">
+				<div class="profile"><div class="avatar" id="avatar">ط</div><div><div class="profile-name" id="profile-name">طالب</div><div class="profile-note">مساحة الدراسة</div></div><button class="logout" id="logout" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج">↪</button></div>
+			</div>
+		</aside>
+
+		<main>
+			<header class="topbar">
+				<div><div class="eyebrow" id="greeting">أهلاً بك</div><h1>خطتك الدراسية</h1></div>
+				<div class="top-actions"><button class="icon-button" id="notifications" type="button" title="تفعيل إشعارات المتصفح">تفعيل التنبيهات</button><button class="primary-button" id="add-lesson" type="button">+ إضافة درس</button></div>
+			</header>
+
+			<section class="welcome-strip" aria-label="الدرس القادم والتاريخ">
+				<div class="focus-card" id="focus-card"></div>
+				<div class="date-card"><div><div class="date-card-label">النهارده</div><div class="big-date" id="today-date"></div></div><div class="date-sub" id="today-name"></div></div>
+			</section>
+
+			<section class="stats" aria-label="ملخص اليوم">
+				<div class="stat"><div class="stat-label">دروس النهارده</div><div class="stat-value" id="stat-lessons">٠</div></div>
+				<div class="stat"><div class="stat-label">دروس خلصت</div><div class="stat-value" id="stat-done">٠</div></div>
+				<div class="stat"><div class="stat-label">واجبات شغالة</div><div class="stat-value" id="stat-homework">٠</div></div>
+			</section>
+
+			<section aria-labelledby="week-title">
+				<div class="section-heading"><div><h2 id="week-title">جدول الأسبوع</h2><p>اضغط على أي درس لتعديل موعده</p></div></div>
+				<div class="day-picker" id="day-picker"></div>
+				<div class="week-grid" id="week-grid"></div>
+			</section>
+
+			<section class="today-section" aria-labelledby="day-title">
+				<div class="section-heading"><div><h2 id="day-title">دروس اليوم</h2><p id="day-caption">مواعيدك مرتبة حسب الوقت</p></div></div>
+				<div class="lesson-list" id="lesson-list"></div>
+			</section>
+
+			<section class="homework-section" id="homework-section" aria-labelledby="homework-title">
+				<div class="section-heading"><div><h2 id="homework-title">وقت الواجب</h2><p>مؤقتاتك تستمر حتى لو أغلقت الصفحة</p></div></div>
+				<div class="homework-list" id="homework-list"></div>
+			</section>
+		</main>
+	</div>
+	<div class="reminder" id="reminder" role="status"><div><strong id="reminder-title">ميعاد الدرس</strong><span id="reminder-copy"></span></div><button class="secondary-button" id="dismiss-reminder" type="button">تمام</button></div>
+	<div id="modal-root"></div>
+	<div id="toast-root" aria-live="polite"></div>
+
+	<script>
+		(() => {
+			const user = JSON.parse(localStorage.getItem('jadwali_user') || 'null');
+			if (!user) { location.replace('login.html'); return; }
+
+			const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+			const colors = ['#77a88e', '#df9673', '#7897ba', '#d3aa53', '#9b86b5'];
+			const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
+			let lessons = read('jadwali_lessons', []);
+			let completions = read('jadwali_completions', {});
+			let homework = read('jadwali_homework', []);
+			let selectedDay = new Date().getDay();
+			let toastTimeout;
+
+			const $ = (selector) => document.querySelector(selector);
+			const save = () => {
+				localStorage.setItem('jadwali_lessons', JSON.stringify(lessons));
+				localStorage.setItem('jadwali_completions', JSON.stringify(completions));
+				localStorage.setItem('jadwali_homework', JSON.stringify(homework));
+			};
+			const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+			const localDateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+			const dateLabel = new Intl.DateTimeFormat('ar-EG', { day: 'numeric', month: 'long' });
+			const timeLabel = (time) => new Intl.DateTimeFormat('ar-EG', { hour: 'numeric', minute: '2-digit' }).format(new Date(`2000-01-01T${time}:00`));
+			const toArabicNumber = (number) => new Intl.NumberFormat('ar-EG').format(number);
+			const todayKey = () => localDateKey(new Date());
+			const isDone = (lesson, date = todayKey()) => Boolean(completions[`${date}_${lesson.id}`]);
+			const dayLessons = (day) => lessons.filter((lesson) => Number(lesson.day) === Number(day)).sort((a, b) => a.time.localeCompare(b.time));
+
+			$('#profile-name').textContent = user.name || user.email || 'طالب';
+			$('#avatar').textContent = (user.name || user.email || 'ط').trim().charAt(0);
+			$('#greeting').textContent = `أهلاً يا ${user.name || 'بطل'}`;
+
+			function renderDate() {
+				const now = new Date();
+				$('#today-date').textContent = dateLabel.format(now);
+				$('#today-name').textContent = new Intl.DateTimeFormat('ar-EG', { weekday: 'long', year: 'numeric' }).format(now);
+				$('#day-title').textContent = selectedDay === now.getDay() ? 'دروس اليوم' : `دروس ${days[selectedDay]}`;
+				$('#day-caption').textContent = selectedDay === now.getDay() ? 'مواعيدك مرتبة حسب الوقت' : `مواعيد يوم ${days[selectedDay]}`;
+			}
+
+			function renderWeek() {
+				const picker = $('#day-picker');
+				picker.innerHTML = days.map((day, index) => `<button class="day-pick ${index === selectedDay ? 'active' : ''}" data-day="${index}" type="button">${day}</button>`).join('');
+				picker.querySelectorAll('[data-day]').forEach((button) => button.addEventListener('click', () => { selectedDay = Number(button.dataset.day); render(); }));
+				$('#week-grid').innerHTML = days.map((day, index) => {
+					const entries = dayLessons(index);
+					const todayClass = index === new Date().getDay() ? 'today' : '';
+					return `<article class="day-column ${index === selectedDay ? 'selected' : ''} ${todayClass}" data-column="${index}"><div class="day-column-head"><span class="day-name">${day}</span><span class="day-count">${toArabicNumber(entries.length)}</span></div>${entries.length ? entries.map((lesson) => `<button class="lesson-chip" type="button" data-edit="${escapeHtml(lesson.id)}" style="--chip:${lesson.color || colors[0]}"><strong>${escapeHtml(lesson.title)}</strong><span>${timeLabel(lesson.time)}</span></button>`).join('') : '<div class="empty-day">مفيش دروس</div>'}</article>`;
+				}).join('');
+				$('#week-grid').querySelectorAll('[data-edit]').forEach((button) => button.addEventListener('click', () => openLessonModal(button.dataset.edit)));
+			}
+
+			function renderLessons() {
+				const entries = dayLessons(selectedDay);
+				if (!entries.length) {
+					$('#lesson-list').innerHTML = `<div class="empty-state">مفيش دروس في اليوم ده. اضغط «إضافة درس» وابدأ جدولك.</div>`;
+					return;
+				}
+				$('#lesson-list').innerHTML = entries.map((lesson) => {
+					const now = new Date();
+					const lessonDate = new Date(`${todayKey()}T${lesson.time}:00`);
+					const isToday = selectedDay === now.getDay();
+					  const done = isToday && isDone(lesson);
+					const isCurrent = isToday && now >= lessonDate && now.getTime() < lessonDate.getTime() + lesson.duration * 60000;
+					const status = done ? '<span class="lesson-status done">خلص الدرس</span>' : isCurrent ? '<span class="lesson-status">الدرس دلوقتي</span>' : '';
+					  const actions = !isToday ? '<span class="lesson-status">الإنجاز متاح يوم الدرس</span>' : done ? `${status}<button class="finish-button" disabled type="button">تم الإنجاز</button>` : `${status}<button class="finish-button" data-finish="${escapeHtml(lesson.id)}" type="button">خلصت الدرس</button>`;
+					  return `<article class="lesson-row" style="--row-color:${lesson.color || colors[0]}"><div class="lesson-time">${timeLabel(lesson.time)}</div><div class="lesson-main"><div class="lesson-title">${escapeHtml(lesson.title)}</div><div class="lesson-subtitle">${lesson.teacher ? `${escapeHtml(lesson.teacher)} · ` : ''}${toArabicNumber(lesson.duration)} دقيقة</div></div><div class="lesson-actions">${actions}</div></article>`;
+				}).join('');
+				$('#lesson-list').querySelectorAll('[data-finish]').forEach((button) => button.addEventListener('click', () => finishLesson(button.dataset.finish)));
+			}
+
+			function renderFocus() {
+				const now = new Date();
+				const candidates = [];
+				for (let offset = 0; offset < 7; offset++) {
+					const day = (now.getDay() + offset) % 7;
+					const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset);
+					for (const lesson of dayLessons(day)) {
+						const at = new Date(`${localDateKey(date)}T${lesson.time}:00`);
+						if (at.getTime() + lesson.duration * 60000 > now.getTime() && !isDone(lesson, localDateKey(date))) candidates.push({ lesson, at, offset });
+					}
+				}
+				candidates.sort((a, b) => a.at - b.at);
+				if (!candidates.length) {
+					$('#focus-card').innerHTML = '<div><div class="focus-label">الدرس القادم</div><div class="focus-title">يومك فاضي!</div><div class="focus-empty">ضيف دروسك وخلي كل حاجة في وقتها.</div></div><div class="focus-bottom"><span class="focus-meta">وقتك للمذاكرة أو الراحة</span><span class="countdown">جاهز؟</span></div>';
+					return;
+				}
+				const { lesson, at, offset } = candidates[0];
+				const diff = at - now;
+				const remaining = Math.max(0, Math.ceil((at.getTime() + lesson.duration * 60000 - now.getTime()) / 60000));
+				const when = offset === 0 ? 'النهارده' : offset === 1 ? 'بكرة' : days[at.getDay()];
+				const countdown = diff <= 0 ? `فاضل ${toArabicNumber(remaining)} د` : diff < 3600000 ? `فاضل ${toArabicNumber(Math.ceil(diff / 60000))} د` : `الساعة ${timeLabel(lesson.time)}`;
+				$('#focus-card').innerHTML = `<div><div class="focus-label">الدرس القادم · ${when}</div><div class="focus-title">${escapeHtml(lesson.title)}</div><div class="focus-meta">${timeLabel(lesson.time)} · ${toArabicNumber(lesson.duration)} دقيقة</div></div><div class="focus-bottom"><span class="focus-meta">${offset === 0 && diff <= 0 ? 'بدأ الدرس، شد حيلك!' : 'جهّز نفسك قبل المعاد'}</span><span class="countdown">${countdown}</span></div>`;
+			}
+
+			function renderHomework() {
+				const active = homework.filter((task) => !task.done);
+				$('#stat-lessons').textContent = toArabicNumber(dayLessons(new Date().getDay()).length);
+				$('#stat-done').textContent = toArabicNumber(dayLessons(new Date().getDay()).filter((lesson) => isDone(lesson)).length);
+				$('#stat-homework').textContent = toArabicNumber(active.length);
+				if (!homework.length) {
+					$('#homework-list').innerHTML = '<div class="empty-state" style="grid-column:1/-1">لما تخلص درس، هنظبطلك وقت الواجب هنا.</div>';
+					return;
+				}
+				$('#homework-list').innerHTML = homework.slice().reverse().map((task) => {
+					const seconds = Math.max(0, Math.ceil((task.endsAt - Date.now()) / 1000));
+					const timer = task.done ? 'خلص' : seconds > 0 ? `${toArabicNumber(Math.floor(seconds / 60))}:${String(seconds % 60).padStart(2, '0')}` : 'الوقت خلص';
+					return `<article class="homework-item ${task.done ? 'done' : ''}"><span class="task-mark"></span><div class="task-copy"><strong>واجب ${escapeHtml(task.title)}</strong><span>${task.done ? 'تم إنجاز الواجب' : `بدأ ${dateLabel.format(new Date(task.startedAt))}`}</span></div><span class="task-timer" data-timer="${escapeHtml(task.id)}">${timer}</span>${task.done ? '' : `<button class="task-complete" type="button" data-task="${escapeHtml(task.id)}">أنجزته</button>`}</article>`;
+				}).join('');
+				$('#homework-list').querySelectorAll('[data-task]').forEach((button) => button.addEventListener('click', () => {
+					const task = homework.find((item) => item.id === button.dataset.task);
+					if (task) task.done = true;
+					save(); renderHomework(); showToast('عاش! خلصت الواجب كمان.');
+				}));
+			}
+
+			function render() { renderDate(); renderWeek(); renderLessons(); renderFocus(); renderHomework(); }
+
+			function openLessonModal(editId = null) {
+				const lesson = lessons.find((item) => item.id === editId);
+				const day = lesson ? lesson.day : selectedDay;
+				$('#modal-root').innerHTML = `<div class="overlay" id="modal-overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="lesson-modal-title"><h2 id="lesson-modal-title">${lesson ? 'تعديل الدرس' : 'درس جديد'}</h2><p>حدد المادة وميعادها، وهفكرك بيها في وقتها.</p><form id="lesson-form"><div class="field"><label for="lesson-title-input">اسم الدرس</label><input id="lesson-title-input" name="title" maxlength="48" required placeholder="مثلاً: رياضيات - جبر" value="${lesson ? escapeHtml(lesson.title) : ''}"></div><div class="form-row"><div class="field"><label for="lesson-day">اليوم</label><select id="lesson-day" name="day">${days.map((name, index) => `<option value="${index}" ${Number(day) === index ? 'selected' : ''}>${name}</option>`).join('')}</select></div><div class="field"><label for="lesson-time">الميعاد</label><input id="lesson-time" name="time" type="time" required value="${lesson ? lesson.time : '16:00'}"></div></div><div class="form-row"><div class="field"><label for="lesson-duration">المدة بالدقايق</label><input id="lesson-duration" name="duration" type="number" min="10" max="360" value="${lesson ? lesson.duration : 60}" required></div><div class="field"><label for="lesson-teacher">المدرس (اختياري)</label><input id="lesson-teacher" name="teacher" maxlength="40" value="${lesson ? escapeHtml(lesson.teacher || '') : ''}" placeholder="اسم المدرس"></div></div><div class="modal-actions"><button class="primary-button" type="submit">${lesson ? 'حفظ التعديل' : 'إضافة للجدول'}</button><button class="secondary-button" id="cancel-modal" type="button">إلغاء</button>${lesson ? '<button class="secondary-button" id="delete-lesson" type="button">حذف</button>' : ''}</div></form></section></div>`;
+				$('#cancel-modal').addEventListener('click', closeModal);
+				$('#modal-overlay').addEventListener('click', (event) => { if (event.target.id === 'modal-overlay') closeModal(); });
+				$('#lesson-form').addEventListener('submit', (event) => {
+					event.preventDefault();
+					const data = new FormData(event.currentTarget);
+					const entry = { id: lesson ? lesson.id : crypto.randomUUID(), title: data.get('title').trim(), day: Number(data.get('day')), time: data.get('time'), duration: Number(data.get('duration')), teacher: data.get('teacher').trim(), color: lesson ? lesson.color : colors[lessons.length % colors.length] };
+					if (lesson) Object.assign(lesson, entry); else lessons.push(entry);
+					selectedDay = entry.day;
+					save(); closeModal(); render(); showToast(lesson ? 'تم تعديل ميعاد الدرس.' : 'اتضاف الدرس لجدولك.');
+				});
+				if (lesson) $('#delete-lesson').addEventListener('click', () => {
+					lessons = lessons.filter((item) => item.id !== lesson.id);
+					save(); closeModal(); render(); showToast('اتحذف الدرس من جدولك.');
+				});
+				$('#lesson-title-input').focus();
+			}
+
+			function closeModal() { $('#modal-root').innerHTML = ''; }
+
+			function finishLesson(id) {
+				const lesson = lessons.find((item) => item.id === id);
+				if (!lesson) return;
+				completions[`${todayKey()}_${lesson.id}`] = true;
+				save(); render();
+				$('#modal-root').innerHTML = `<div class="overlay" id="celebrate-overlay"><section class="modal celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title"><div class="celebrate-mark">✓</div><h2 id="celebrate-title">برافو عليك! 🎉</h2><p>خلصت درس ${escapeHtml(lesson.title)}. إنجاز جميل، كمل بنفس الحماس!</p><form id="homework-form"><div class="field" style="text-align:right"><label for="homework-minutes">قد إيه وقت للواجب؟ (بالدقايق)</label><input id="homework-minutes" name="minutes" type="number" min="5" max="480" value="30" required></div><div class="modal-actions"><button class="primary-button" type="submit">ابدأ وقت الواجب</button><button class="secondary-button" id="skip-homework" type="button">بعدين</button></div></form></section></div>`;
+				$('#homework-form').addEventListener('submit', (event) => {
+					event.preventDefault();
+					const minutes = Number(new FormData(event.currentTarget).get('minutes'));
+					homework.push({ id: crypto.randomUUID(), title: lesson.title, startedAt: Date.now(), endsAt: Date.now() + minutes * 60000, done: false });
+					save(); closeModal(); render(); showToast(`بدأ وقت واجب ${lesson.title}. بالتوفيق!`);
+				});
+				$('#skip-homework').addEventListener('click', () => { closeModal(); showToast('اتسجل إنجاز الدرس. تقدر تبدأ الواجب بعدين.'); });
+			}
+
+			function showToast(message) {
+				clearTimeout(toastTimeout);
+				$('#toast-root').innerHTML = `<div class="toast">${escapeHtml(message)}</div>`;
+				toastTimeout = setTimeout(() => { $('#toast-root').innerHTML = ''; }, 3400);
+			}
+
+			const alerted = new Set(read('jadwali_alerted', []));
+			function checkReminders() {
+				const now = new Date();
+				const key = todayKey();
+				for (const lesson of dayLessons(now.getDay())) {
+					const at = new Date(`${key}T${lesson.time}:00`);
+					const minuteKey = `${key}_${lesson.id}`;
+					  if (now >= at && now < new Date(at.getTime() + lesson.duration * 60000) && !isDone(lesson) && !alerted.has(minuteKey)) {
+						alerted.add(minuteKey);
+						localStorage.setItem('jadwali_alerted', JSON.stringify([...alerted]));
+						$('#reminder-title').textContent = `ميعاد ${lesson.title}!`;
+						$('#reminder-copy').textContent = `الدرس بدأ دلوقتي · ${timeLabel(lesson.time)}`;
+						$('#reminder').classList.add('show');
+						if ('Notification' in window && Notification.permission === 'granted') new Notification(`ميعاد ${lesson.title}`, { body: 'الدرس بدأ دلوقتي، شد حيلك!' });
+						render();
+					}
+				}
+				renderFocus();
+			}
+
+			$('#add-lesson').addEventListener('click', () => openLessonModal());
+			$('#logout').addEventListener('click', () => { localStorage.removeItem('jadwali_user'); location.href = 'login.html'; });
+			$('#dismiss-reminder').addEventListener('click', () => $('#reminder').classList.remove('show'));
+			$('#notifications').addEventListener('click', async () => {
+				if (!('Notification' in window)) { showToast('المتصفح ده مش بيدعم إشعارات سطح المكتب.'); return; }
+				const permission = await Notification.requestPermission();
+				showToast(permission === 'granted' ? 'تمام، إشعارات الدروس اتفعلت.' : 'التنبيهات هتظهر جوه الموقع أثناء فتحه.');
+			});
+			$('#homework-nav').addEventListener('click', () => $('#homework-section').scrollIntoView({ behavior: 'smooth' }));
+			document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
+			$('#reminder').classList.remove('show');
+			render();
+			checkReminders();
+			setInterval(() => { renderLessons(); renderHomework(); checkReminders(); }, 15000);
+			setInterval(() => renderHomework(), 1000);
+		})();
+	</script>
+</body>
+</html>
+        
