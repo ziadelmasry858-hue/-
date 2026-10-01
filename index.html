@@ -36,8 +36,14 @@
 		.sidebar-bottom { margin-top: auto; }
 		.profile { border-top: 1px solid var(--line); padding: 18px 2px 0; display: flex; align-items: center; gap: 10px; }
 		.avatar { width: 39px; height: 39px; display: grid; place-items: center; border-radius: 50%; background: #f4d8cb; color: #754739; font-weight: 800; }
+		.avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
 		.profile-name { font-size: 14px; font-weight: 700; }
 		.profile-note { color: var(--muted); font-size: 12px; }
+		.profile-edit { border: 0; background: transparent; color: var(--green); padding: 8px; font-size: 16px; }
+		.profile-fields { margin-top: 5px; }
+		.profile-preview { display: flex; align-items: center; gap: 12px; }
+		.profile-preview .avatar { width: 58px; height: 58px; font-size: 21px; flex: 0 0 auto; }
+		.field input[type="file"] { padding: 8px; }
 		.logout { margin-right: auto; border: 0; color: var(--muted); background: none; padding: 8px; }
 		main { width: 100%; max-width: 1600px; margin: auto; padding: 32px clamp(20px, 4vw, 60px) 60px; }
 		.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 30px; }
@@ -176,7 +182,7 @@
 				</nav>
 			</div>
 			<div class="sidebar-bottom">
-				<div class="profile"><div class="avatar" id="avatar">ط</div><div><div class="profile-name" id="profile-name">طالب</div><div class="profile-note">مساحة الدراسة</div></div><button class="logout" id="logout" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج">↪</button></div>
+				<div class="profile"><div class="avatar" id="avatar">ط</div><div><div class="profile-name" id="profile-name">طالب</div><div class="profile-note" id="profile-note">مساحة الدراسة</div></div><button class="profile-edit" id="edit-profile" type="button" aria-label="تعديل الملف الشخصي" title="تعديل الملف الشخصي">✎</button><button class="logout" id="logout" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج">↪</button></div>
 			</div>
 		</aside>
 
@@ -247,9 +253,14 @@
 			const isDone = (lesson, date = todayKey()) => Boolean(completions[`${date}_${lesson.id}`]);
 			const dayLessons = (day) => lessons.filter((lesson) => Number(lesson.day) === Number(day)).sort((a, b) => a.time.localeCompare(b.time));
 
-			$('#profile-name').textContent = user.name || user.email || 'طالب';
-			$('#avatar').textContent = (user.name || user.email || 'ط').trim().charAt(0);
-			$('#greeting').textContent = `أهلاً يا ${user.name || 'بطل'}`;
+			function renderProfile() {
+				const name = user.name || user.email || 'طالب';
+				$('#profile-name').textContent = name;
+				$('#profile-note').textContent = user.purpose || 'مساحة الدراسة';
+				$('#avatar').innerHTML = user.avatar ? `<img src="${escapeHtml(user.avatar)}" alt="">` : escapeHtml(name.trim().charAt(0));
+				$('#greeting').textContent = `أهلاً يا ${user.name || 'بطل'}`;
+			}
+			renderProfile();
 
 			function renderDate() {
 				const now = new Date();
@@ -360,6 +371,73 @@
 
 			function closeModal() { $('#modal-root').innerHTML = ''; }
 
+			function resizeProfileImage(file) {
+				return new Promise((resolve, reject) => {
+					const reader = new FileReader();
+					reader.onerror = () => reject(new Error('تعذر قراءة الصورة.'));
+					reader.onload = () => {
+						const image = new Image();
+						image.onerror = () => reject(new Error('الصورة غير صالحة.'));
+						image.onload = () => {
+							const scale = Math.min(1, 320 / Math.max(image.width, image.height));
+							const canvas = document.createElement('canvas');
+							canvas.width = Math.max(1, Math.round(image.width * scale));
+							canvas.height = Math.max(1, Math.round(image.height * scale));
+							canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+							resolve(canvas.toDataURL('image/jpeg', .82));
+						};
+						image.src = reader.result;
+					};
+					reader.readAsDataURL(file);
+				});
+			}
+
+			function openProfileModal() {
+				let avatar = user.avatar || '';
+				const name = user.name || '';
+				const preview = () => avatar ? `<img src="${escapeHtml(avatar)}" alt="">` : escapeHtml(($('#profile-name').textContent || 'ط').trim().charAt(0));
+				$('#modal-root').innerHTML = `<div class="overlay" id="modal-overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title"><h2 id="profile-modal-title">تعديل الملف الشخصي</h2><p>حدّث بياناتك وتفضيلاتك الدراسية.</p><form id="profile-form"><div class="profile-preview"><div class="avatar" id="profile-avatar-preview">${preview()}</div><div class="field profile-fields"><label for="profile-image">صورة الحساب</label><input id="profile-image" type="file" accept="image/*"></div></div><div class="field"><label for="profile-name-input">الاسم</label><input id="profile-name-input" name="name" maxlength="50" required value="${escapeHtml(name)}" placeholder="اسمك اللي بتحبه"></div><div class="field"><label for="profile-purpose">غرض الحساب</label><input id="profile-purpose" name="purpose" maxlength="80" value="${escapeHtml(user.purpose || '')}" placeholder="مثلاً: تنظيم مذاكرتي"></div><div class="field"><label for="profile-subjects">موادي المفضلة</label><input id="profile-subjects" name="subjects" maxlength="200" value="${escapeHtml((user.favoriteSubjects || []).join('، '))}" placeholder="مثلاً: رياضيات، علوم، لغة عربية"></div><div class="error" id="profile-error" role="alert"></div><div class="modal-actions"><button class="primary-button" type="submit">حفظ التغييرات</button><button class="secondary-button" id="cancel-modal" type="button">إلغاء</button></div></form></section></div>`;
+				$('#cancel-modal').addEventListener('click', closeModal);
+				$('#modal-overlay').addEventListener('click', (event) => { if (event.target.id === 'modal-overlay') closeModal(); });
+				$('#profile-image').addEventListener('change', async (event) => {
+					const file = event.currentTarget.files[0];
+					if (!file) return;
+					if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) {
+						$('#profile-error').textContent = 'اختر صورة صالحة لا يتجاوز حجمها ١٠ ميجابايت.';
+						event.currentTarget.value = '';
+						return;
+					}
+					try {
+						avatar = await resizeProfileImage(file);
+						$('#profile-avatar-preview').innerHTML = preview();
+						$('#profile-error').textContent = '';
+					} catch {
+						$('#profile-error').textContent = 'تعذر تحميل الصورة. جرب صورة أخرى.';
+					}
+				});
+				$('#profile-form').addEventListener('submit', (event) => {
+					event.preventDefault();
+					const data = new FormData(event.currentTarget);
+					user.name = String(data.get('name')).trim();
+					user.purpose = String(data.get('purpose')).trim();
+					user.favoriteSubjects = String(data.get('subjects')).split(/[,،]/).map((subject) => subject.trim()).filter(Boolean);
+					user.avatar = avatar;
+					localStorage.setItem('jadwali_user', JSON.stringify(user));
+					const account = read('jadwali_account', null);
+					if (account && account.email === user.email) {
+						account.name = user.name;
+						account.purpose = user.purpose;
+						account.favoriteSubjects = user.favoriteSubjects;
+						account.avatar = user.avatar;
+						localStorage.setItem('jadwali_account', JSON.stringify(account));
+					}
+					renderProfile();
+					closeModal();
+					showToast('تم تحديث الملف الشخصي.');
+				});
+				$('#profile-name-input').focus();
+			}
+
 			function finishLesson(id) {
 				const lesson = lessons.find((item) => item.id === id);
 				if (!lesson) return;
@@ -402,6 +480,7 @@
 			}
 
 			$('#add-lesson').addEventListener('click', () => openLessonModal());
+			$('#edit-profile').addEventListener('click', openProfileModal);
 			$('#logout').addEventListener('click', () => { localStorage.removeItem('jadwali_user'); location.href = 'login.html'; });
 			$('#dismiss-reminder').addEventListener('click', () => $('#reminder').classList.remove('show'));
 			$('#notifications').addEventListener('click', async () => {
