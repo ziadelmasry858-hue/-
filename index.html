@@ -70,6 +70,20 @@
 		.stat { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 15px 18px; display: flex; justify-content: space-between; align-items: center; }
 		.stat-label { color: var(--muted); font-size: 13px; font-weight: 600; }
 		.stat-value { font-size: 23px; font-weight: 800; color: var(--green); }
+		.rewards-strip { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; margin-bottom: 18px; }
+		.coin-balance, .messages-button { min-height: 76px; border: 1px solid var(--line); background: #fff; border-radius: 10px; }
+		.coin-balance { display: flex; align-items: center; gap: 13px; padding: 13px 18px; }
+		.coin-mark { width: 42px; height: 42px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; color: #785b17; background: #f7e7a7; font-size: 22px; }
+		.coin-copy { color: var(--muted); font-size: 13px; font-weight: 600; }
+		.coin-total { display: block; color: var(--ink); font-size: 23px; font-weight: 800; line-height: 1.2; }
+		.messages-button { position: relative; display: flex; align-items: center; gap: 10px; padding: 0 18px; color: var(--green); font-weight: 800; }
+		.messages-icon { font-size: 19px; }
+		.message-count { min-width: 21px; height: 21px; display: grid; place-items: center; padding: 0 5px; border-radius: 11px; background: var(--coral); color: #fff; font-size: 11px; }
+		.message-list { display: grid; gap: 9px; max-height: min(55vh, 430px); overflow-y: auto; }
+		.message-item { border-right: 3px solid #d6b14b; border-radius: 5px; background: #f7f8f3; padding: 11px 13px; }
+		.message-item strong { display: block; font-size: 14px; }
+		.message-item p { margin: 4px 0; color: var(--ink); line-height: 1.6; }
+		.message-item time { color: var(--muted); font-size: 11px; }
 		.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
 		.section-heading h2 { font-size: 21px; margin: 0; font-weight: 800; }
 		.section-heading p { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
@@ -144,6 +158,13 @@
 			.icon-button { width: 43px; padding: 0; font-size: 0; }
 			.icon-button::before { content: '◉'; font-size: 17px; }
 			.primary-button { padding-inline: 13px; font-size: 13px; }
+			.rewards-strip { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-bottom: 14px; }
+			.coin-balance, .messages-button { min-height: 66px; }
+			.coin-balance { padding: 10px; gap: 9px; }
+			.coin-mark { width: 36px; height: 36px; font-size: 19px; }
+			.coin-copy { font-size: 11px; }
+			.coin-total { font-size: 20px; }
+			.messages-button { gap: 6px; padding: 0 11px; font-size: 13px; }
 			.welcome-strip { grid-template-columns: 1fr; }
 			.focus-card { min-height: 174px; padding: 20px; }
 			.date-card { padding: 16px 20px; flex-direction: row; align-items: center; }
@@ -191,6 +212,10 @@
 				<div><div class="eyebrow" id="greeting">أهلاً بك</div><h1>خطتك الدراسية</h1></div>
 				<div class="top-actions"><button class="icon-button" id="notifications" type="button" title="تفعيل إشعارات المتصفح">تفعيل التنبيهات</button><button class="primary-button" id="add-lesson" type="button">+ إضافة درس</button></div>
 			</header>
+			<section class="rewards-strip" aria-label="رصيد العملات والرسائل">
+				<div class="coin-balance"><span class="coin-mark" aria-hidden="true">●</span><div><span class="coin-copy">رصيدك من الكوينز</span><strong class="coin-total" id="coin-total">٠</strong></div></div>
+				<button class="messages-button" id="open-messages" type="button"><span class="messages-icon" aria-hidden="true">✉</span><span>الرسائل</span><span class="message-count" id="message-count" hidden>٠</span></button>
+			</section>
 
 			<section class="welcome-strip" aria-label="الدرس القادم والتاريخ">
 				<div class="focus-card" id="focus-card"></div>
@@ -235,6 +260,8 @@
 			let lessons = read('jadwali_lessons', []);
 			let completions = read('jadwali_completions', {});
 			let homework = read('jadwali_homework', []);
+			let coins = read('jadwali_coins', 0);
+			let messages = read('jadwali_messages', []);
 			let selectedDay = new Date().getDay();
 			let toastTimeout;
 
@@ -243,6 +270,8 @@
 				localStorage.setItem('jadwali_lessons', JSON.stringify(lessons));
 				localStorage.setItem('jadwali_completions', JSON.stringify(completions));
 				localStorage.setItem('jadwali_homework', JSON.stringify(homework));
+				localStorage.setItem('jadwali_coins', JSON.stringify(coins));
+				localStorage.setItem('jadwali_messages', JSON.stringify(messages));
 			};
 			const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 			const localDateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -250,6 +279,12 @@
 			const timeLabel = (time) => new Intl.DateTimeFormat('ar-EG', { hour: 'numeric', minute: '2-digit' }).format(new Date(`2000-01-01T${time}:00`));
 			const toArabicNumber = (number) => new Intl.NumberFormat('ar-EG').format(number);
 			const todayKey = () => localDateKey(new Date());
+			const formatDuration = (milliseconds) => {
+				const minutes = Math.max(1, Math.ceil(milliseconds / 60000));
+				const hours = Math.floor(minutes / 60);
+				const remainingMinutes = minutes % 60;
+				return [hours ? `${toArabicNumber(hours)} ساعة` : '', remainingMinutes ? `${toArabicNumber(remainingMinutes)} دقيقة` : ''].filter(Boolean).join(' و ');
+			};
 			const isDone = (lesson, date = todayKey()) => Boolean(completions[`${date}_${lesson.id}`]);
 			const dayLessons = (day) => lessons.filter((lesson) => Number(lesson.day) === Number(day)).sort((a, b) => a.time.localeCompare(b.time));
 
@@ -268,6 +303,24 @@
 				$('#today-name').textContent = new Intl.DateTimeFormat('ar-EG', { weekday: 'long', year: 'numeric' }).format(now);
 				$('#day-title').textContent = selectedDay === now.getDay() ? 'دروس اليوم' : `دروس ${days[selectedDay]}`;
 				$('#day-caption').textContent = selectedDay === now.getDay() ? 'مواعيدك مرتبة حسب الوقت' : `مواعيد يوم ${days[selectedDay]}`;
+			}
+
+			function addMessage(title, body) {
+				messages.unshift({ id: crypto.randomUUID(), title, body, createdAt: Date.now() });
+			}
+
+			function renderRewards() {
+				$('#coin-total').textContent = toArabicNumber(coins);
+				const count = $('#message-count');
+				count.textContent = toArabicNumber(messages.length);
+				count.hidden = messages.length === 0;
+			}
+
+			function openMessages() {
+				const items = messages.length ? messages.map((message) => `<article class="message-item"><strong>${escapeHtml(message.title)}</strong><p>${escapeHtml(message.body)}</p><time>${new Intl.DateTimeFormat('ar-EG', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(message.createdAt))}</time></article>`).join('') : '<div class="empty-state">مفيش رسائل لسه. هتلاقي هنا مكافآتك وأي تفاصيل عن مواعيد الواجبات.</div>';
+				$('#modal-root').innerHTML = `<div class="overlay" id="modal-overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="messages-title"><h2 id="messages-title">رسائلك</h2><p>مكافآتك وتفاصيل إنجازاتك.</p><div class="message-list">${items}</div><div class="modal-actions"><button class="primary-button" id="close-messages" type="button">تمام</button></div></section></div>`;
+				$('#close-messages').addEventListener('click', closeModal);
+				$('#modal-overlay').addEventListener('click', (event) => { if (event.target.id === 'modal-overlay') closeModal(); });
 			}
 
 			function renderWeek() {
@@ -339,14 +392,10 @@
 					const timer = task.done ? 'خلص' : seconds > 0 ? `${toArabicNumber(Math.floor(seconds / 60))}:${String(seconds % 60).padStart(2, '0')}` : 'الوقت خلص';
 					return `<article class="homework-item ${task.done ? 'done' : ''}"><span class="task-mark"></span><div class="task-copy"><strong>واجب ${escapeHtml(task.title)}</strong><span>${task.done ? 'تم إنجاز الواجب' : `بدأ ${dateLabel.format(new Date(task.startedAt))}`}</span></div><span class="task-timer" data-timer="${escapeHtml(task.id)}">${timer}</span>${task.done ? '' : `<button class="task-complete" type="button" data-task="${escapeHtml(task.id)}">أنجزته</button>`}</article>`;
 				}).join('');
-				$('#homework-list').querySelectorAll('[data-task]').forEach((button) => button.addEventListener('click', () => {
-					const task = homework.find((item) => item.id === button.dataset.task);
-					if (task) task.done = true;
-					save(); renderHomework(); showToast('عاش! خلصت الواجب كمان.');
-				}));
+				$('#homework-list').querySelectorAll('[data-task]').forEach((button) => button.addEventListener('click', () => completeHomework(button.dataset.task)));
 			}
 
-			function render() { renderDate(); renderWeek(); renderLessons(); renderFocus(); renderHomework(); }
+			function render() { renderDate(); renderWeek(); renderLessons(); renderFocus(); renderHomework(); renderRewards(); }
 
 			function openLessonModal(editId = null) {
 				const lesson = lessons.find((item) => item.id === editId);
@@ -440,8 +489,10 @@
 
 			function finishLesson(id) {
 				const lesson = lessons.find((item) => item.id === id);
-				if (!lesson) return;
+				if (!lesson || isDone(lesson)) return;
 				completions[`${todayKey()}_${lesson.id}`] = true;
+				coins += 10;
+				addMessage('مكافأة إنجاز درس', `كسبت ١٠ كوينز عشان خلصت درس ${lesson.title}.`);
 				save(); render();
 				$('#modal-root').innerHTML = `<div class="overlay" id="celebrate-overlay"><section class="modal celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title"><div class="celebrate-mark">✓</div><h2 id="celebrate-title">برافو عليك! 🎉</h2><p>خلصت درس ${escapeHtml(lesson.title)}. إنجاز جميل، كمل بنفس الحماس!</p><form id="homework-form"><div class="field" style="text-align:right"><label for="homework-minutes">قد إيه وقت للواجب؟ (بالدقايق)</label><input id="homework-minutes" name="minutes" type="number" min="5" max="480" value="30" required></div><div class="modal-actions"><button class="primary-button" type="submit">ابدأ وقت الواجب</button><button class="secondary-button" id="skip-homework" type="button">بعدين</button></div></form></section></div>`;
 				$('#homework-form').addEventListener('submit', (event) => {
@@ -451,6 +502,21 @@
 					save(); closeModal(); render(); showToast(`بدأ وقت واجب ${lesson.title}. بالتوفيق!`);
 				});
 				$('#skip-homework').addEventListener('click', () => { closeModal(); showToast('اتسجل إنجاز الدرس. تقدر تبدأ الواجب بعدين.'); });
+			}
+
+			function completeHomework(id) {
+				const task = homework.find((item) => item.id === id);
+				if (!task || task.done) return;
+				task.done = true;
+				const onTime = Date.now() <= task.endsAt;
+				if (onTime) {
+					coins += 15;
+					addMessage('مكافأة واجب', `أنجزت واجب ${task.title} قبل الميعاد، وكسبت ١٥ كوينز.`);
+				} else {
+					addMessage('الواجب اتأخر', `أنجزت واجب ${task.title} بعد الميعاد بـ ${formatDuration(Date.now() - task.endsAt)}.`);
+				}
+				save(); renderHomework(); renderRewards();
+				showToast(onTime ? 'عاش! كسبت ١٥ كوينز على الواجب.' : 'اتسجل إنجاز الواجب.');
 			}
 
 			function showToast(message) {
@@ -480,6 +546,7 @@
 			}
 
 			$('#add-lesson').addEventListener('click', () => openLessonModal());
+			$('#open-messages').addEventListener('click', openMessages);
 			$('#edit-profile').addEventListener('click', openProfileModal);
 			$('#logout').addEventListener('click', () => { localStorage.removeItem('jadwali_user'); location.href = 'login.html'; });
 			$('#dismiss-reminder').addEventListener('click', () => $('#reminder').classList.remove('show'));
