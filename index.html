@@ -50,6 +50,8 @@
 		.eyebrow { color: var(--muted); font-size: 14px; font-weight: 600; margin-bottom: 4px; }
 		h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); line-height: 1.25; font-weight: 800; }
 		.top-actions { display: flex; align-items: center; gap: 10px; }
+		.language-select { min-height: 43px; max-width: 145px; border: 1px solid var(--line); border-radius: 10px; background: white; color: var(--green); padding: 0 10px; font-weight: 700; }
+		.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 		.icon-button { border: 1px solid var(--line); background: white; color: var(--green); border-radius: 10px; min-height: 43px; padding: 0 14px; font-weight: 700; }
 		.primary-button { border: 0; background: var(--green); color: #fff; min-height: 45px; padding: 0 19px; border-radius: 10px; font-weight: 700; transition: transform .18s, background .18s; }
 		.primary-button:hover { background: #24584d; transform: translateY(-1px); }
@@ -153,8 +155,9 @@
 			.side-label { display: none; }
 			.nav-link { width: auto; justify-content: center; padding: 9px 14px; font-size: 13px; }
 			main { padding: 22px 16px 42px; }
-			.topbar { align-items: start; margin-bottom: 22px; }
-			.top-actions { flex-shrink: 0; }
+			.topbar { align-items: start; flex-wrap: wrap; margin-bottom: 22px; }
+			.top-actions { width: 100%; flex-shrink: 0; justify-content: flex-start; gap: 7px; }
+			.language-select { max-width: 112px; }
 			.icon-button { width: 43px; padding: 0; font-size: 0; }
 			.icon-button::before { content: '◉'; font-size: 17px; }
 			.primary-button { padding-inline: 13px; font-size: 13px; }
@@ -196,10 +199,10 @@
 		<aside class="sidebar">
 			<div class="brand"><span class="brand-mark">ج</span><span>جدولي</span></div>
 			<div>
-				<p class="side-label">القائمة</p>
-				<nav aria-label="التنقل الرئيسي">
-					<button class="nav-link active" type="button"><span class="nav-dot"></span>جدولي الدراسي</button>
-					<button class="nav-link" type="button" id="homework-nav"><span class="nav-dot"></span>الواجبات</button>
+				<p class="side-label" data-i18n="menu">القائمة</p>
+				<nav aria-label="التنقل الرئيسي" data-i18n-aria="mainNavigation">
+					<button class="nav-link active" type="button"><span class="nav-dot"></span><span data-i18n="mySchedule">جدولي الدراسي</span></button>
+					<button class="nav-link" type="button" id="homework-nav"><span class="nav-dot"></span><span data-i18n="homework">الواجبات</span></button>
 				</nav>
 			</div>
 			<div class="sidebar-bottom">
@@ -209,27 +212,27 @@
 
 		<main>
 			<header class="topbar">
-				<div><div class="eyebrow" id="greeting">أهلاً بك</div><h1>خطتك الدراسية</h1></div>
-				<div class="top-actions"><button class="icon-button" id="notifications" type="button" title="تفعيل إشعارات المتصفح">تفعيل التنبيهات</button><button class="primary-button" id="add-lesson" type="button">+ إضافة درس</button></div>
+				<div><div class="eyebrow" id="greeting">أهلاً بك</div><h1 data-i18n="studyPlan">خطتك الدراسية</h1></div>
+				<div class="top-actions"><label class="visually-hidden" for="language-select" data-i18n="language">اللغة</label><select class="language-select" id="language-select" aria-label="اللغة"><option value="ar">العربية</option><option value="en">English</option><option value="fr">Français</option><option value="es">Español</option><option value="de">Deutsch</option><option value="tr">Türkçe</option><option value="ur">اردو</option><option value="hi">हिन्दी</option><option value="zh">中文</option><option value="ja">日本語</option></select><button class="icon-button" id="notifications" type="button" title="تفعيل إشعارات المتصفح" data-i18n="notifications">تفعيل التنبيهات</button><button class="primary-button" id="add-lesson" type="button" data-i18n="addLesson">+ إضافة درس</button></div>
 			</header>
 			<section class="rewards-strip" aria-label="رصيد العملات والرسائل">
-				<div class="coin-balance"><span class="coin-mark" aria-hidden="true">●</span><div><span class="coin-copy">رصيدك من الكوينز</span><strong class="coin-total" id="coin-total">٠</strong></div></div>
-				<button class="messages-button" id="open-messages" type="button"><span class="messages-icon" aria-hidden="true">✉</span><span>الرسائل</span><span class="message-count" id="message-count" hidden>٠</span></button>
+				<div class="coin-balance"><span class="coin-mark" aria-hidden="true">●</span><div><span class="coin-copy" data-i18n="coinBalance">رصيدك من الكوينز</span><strong class="coin-total" id="coin-total">٠</strong></div></div>
+				<button class="messages-button" id="open-messages" type="button"><span class="messages-icon" aria-hidden="true">✉</span><span data-i18n="messages">الرسائل</span><span class="message-count" id="message-count" hidden>٠</span></button>
 			</section>
 
 			<section class="welcome-strip" aria-label="الدرس القادم والتاريخ">
 				<div class="focus-card" id="focus-card"></div>
-				<div class="date-card"><div><div class="date-card-label">النهارده</div><div class="big-date" id="today-date"></div></div><div class="date-sub" id="today-name"></div></div>
+				<div class="date-card"><div><div class="date-card-label" data-i18n="today">النهارده</div><div class="big-date" id="today-date"></div></div><div class="date-sub" id="today-name"></div></div>
 			</section>
 
 			<section class="stats" aria-label="ملخص اليوم">
-				<div class="stat"><div class="stat-label">دروس النهارده</div><div class="stat-value" id="stat-lessons">٠</div></div>
-				<div class="stat"><div class="stat-label">دروس خلصت</div><div class="stat-value" id="stat-done">٠</div></div>
-				<div class="stat"><div class="stat-label">واجبات شغالة</div><div class="stat-value" id="stat-homework">٠</div></div>
+				<div class="stat"><div class="stat-label" data-i18n="lessonsToday">دروس النهارده</div><div class="stat-value" id="stat-lessons">٠</div></div>
+				<div class="stat"><div class="stat-label" data-i18n="lessonsDone">دروس خلصت</div><div class="stat-value" id="stat-done">٠</div></div>
+				<div class="stat"><div class="stat-label" data-i18n="activeHomework">واجبات شغالة</div><div class="stat-value" id="stat-homework">٠</div></div>
 			</section>
 
 			<section aria-labelledby="week-title">
-				<div class="section-heading"><div><h2 id="week-title">جدول الأسبوع</h2><p>اضغط على أي درس لتعديل موعده</p></div></div>
+				<div class="section-heading"><div><h2 id="week-title" data-i18n="weekSchedule">جدول الأسبوع</h2><p data-i18n="editLessonHint">اضغط على أي درس لتعديل موعده</p></div></div>
 				<div class="day-picker" id="day-picker"></div>
 				<div class="week-grid" id="week-grid"></div>
 			</section>
@@ -240,12 +243,12 @@
 			</section>
 
 			<section class="homework-section" id="homework-section" aria-labelledby="homework-title">
-				<div class="section-heading"><div><h2 id="homework-title">وقت الواجب</h2><p>مؤقتاتك تستمر حتى لو أغلقت الصفحة</p></div></div>
+				<div class="section-heading"><div><h2 id="homework-title" data-i18n="homeworkTime">وقت الواجب</h2><p data-i18n="timersPersist">مؤقتاتك تستمر حتى لو أغلقت الصفحة</p></div></div>
 				<div class="homework-list" id="homework-list"></div>
 			</section>
 		</main>
 	</div>
-	<div class="reminder" id="reminder" role="status"><div><strong id="reminder-title">ميعاد الدرس</strong><span id="reminder-copy"></span></div><button class="secondary-button" id="dismiss-reminder" type="button">تمام</button></div>
+	<div class="reminder" id="reminder" role="status"><div><strong id="reminder-title">ميعاد الدرس</strong><span id="reminder-copy"></span></div><button class="secondary-button" id="dismiss-reminder" type="button" data-i18n="okay">تمام</button></div>
 	<div id="modal-root"></div>
 	<div id="toast-root" aria-live="polite"></div>
 
@@ -254,7 +257,47 @@
 			const user = JSON.parse(localStorage.getItem('jadwali_user') || 'null');
 			if (!user) { location.replace('login.html'); return; }
 
-			const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+			const translations = {
+				ar: { language: 'اللغة', menu: 'القائمة', mainNavigation: 'التنقل الرئيسي', mySchedule: 'جدولي الدراسي', homework: 'الواجبات', studyPlan: 'خطتك الدراسية', notifications: 'تفعيل التنبيهات', addLesson: '+ إضافة درس', coinBalance: 'رصيدك من الكوينز', messages: 'الرسائل', today: 'النهارده', lessonsToday: 'دروس النهارده', lessonsDone: 'دروس خلصت', activeHomework: 'واجبات شغالة', weekSchedule: 'جدول الأسبوع', editLessonHint: 'اضغط على أي درس لتعديل موعده', homeworkTime: 'وقت الواجب', timersPersist: 'مؤقتاتك تستمر حتى لو أغلقت الصفحة', okay: 'تمام', scheduleTitle: 'جدول الأسبوع', lessonsTitle: 'دروس اليوم', lessonsCaption: 'مواعيدك مرتبة حسب الوقت', noLessons: 'مفيش دروس', noLessonsToday: 'مفيش دروس في اليوم ده. اضغط «إضافة درس» وابدأ جدولك.', noHomework: 'لما تخلص درس، هنظبطلك وقت الواجب هنا.', nextLesson: 'الدرس القادم', freeDay: 'يومك فاضي!', addLessonsPrompt: 'ضيف دروسك وخلي كل حاجة في وقتها.', studyOrRest: 'وقتك للمذاكرة أو الراحة', ready: 'جاهز؟' },
+				en: { language: 'Language', menu: 'Menu', mainNavigation: 'Main navigation', mySchedule: 'My schedule', homework: 'Homework', studyPlan: 'Your study plan', notifications: 'Enable alerts', addLesson: '+ Add lesson', coinBalance: 'Your coin balance', messages: 'Messages', today: 'Today', lessonsToday: "Today's lessons", lessonsDone: 'Lessons completed', activeHomework: 'Active homework', weekSchedule: 'Weekly schedule', editLessonHint: 'Select a lesson to edit its time', homeworkTime: 'Homework time', timersPersist: 'Timers keep running when you close the page', okay: 'OK', scheduleTitle: 'Weekly schedule', lessonsTitle: "Today's lessons", lessonsCaption: 'Your lessons, sorted by time', noLessons: 'No lessons', noLessonsToday: 'No lessons today. Select “Add lesson” to build your schedule.', noHomework: 'Finish a lesson to set up homework time here.', nextLesson: 'Next lesson', freeDay: 'Your day is free!', addLessonsPrompt: 'Add lessons to keep everything on schedule.', studyOrRest: 'Time to study or rest', ready: 'Ready?' },
+				fr: { language: 'Langue', menu: 'Menu', mainNavigation: 'Navigation principale', mySchedule: 'Mon planning', homework: 'Devoirs', studyPlan: 'Votre planning d’étude', notifications: 'Activer les alertes', addLesson: '+ Ajouter un cours', coinBalance: 'Solde de pièces', messages: 'Messages', today: 'Aujourd’hui', lessonsToday: 'Cours du jour', lessonsDone: 'Cours terminés', activeHomework: 'Devoirs en cours', weekSchedule: 'Planning de la semaine', editLessonHint: 'Sélectionnez un cours pour modifier son horaire', homeworkTime: 'Temps des devoirs', timersPersist: 'Les minuteurs continuent même après la fermeture', okay: 'OK', scheduleTitle: 'Planning de la semaine', lessonsTitle: 'Cours du jour', lessonsCaption: 'Vos cours classés par horaire', noLessons: 'Aucun cours', noLessonsToday: 'Aucun cours aujourd’hui. Ajoutez un cours pour créer votre planning.', noHomework: 'Terminez un cours pour planifier vos devoirs ici.', nextLesson: 'Prochain cours', freeDay: 'Votre journée est libre !', addLessonsPrompt: 'Ajoutez des cours pour organiser votre journée.', studyOrRest: 'Du temps pour étudier ou vous reposer', ready: 'Prêt ?' },
+				es: { language: 'Idioma', menu: 'Menú', mainNavigation: 'Navegación principal', mySchedule: 'Mi horario', homework: 'Tareas', studyPlan: 'Tu plan de estudio', notifications: 'Activar avisos', addLesson: '+ Añadir clase', coinBalance: 'Saldo de monedas', messages: 'Mensajes', today: 'Hoy', lessonsToday: 'Clases de hoy', lessonsDone: 'Clases completadas', activeHomework: 'Tareas activas', weekSchedule: 'Horario semanal', editLessonHint: 'Selecciona una clase para cambiar su hora', homeworkTime: 'Tiempo de tareas', timersPersist: 'Los temporizadores siguen al cerrar la página', okay: 'Vale', scheduleTitle: 'Horario semanal', lessonsTitle: 'Clases de hoy', lessonsCaption: 'Tus clases ordenadas por hora', noLessons: 'No hay clases', noLessonsToday: 'Hoy no hay clases. Añade una para crear tu horario.', noHomework: 'Termina una clase para organizar aquí el tiempo de tareas.', nextLesson: 'Próxima clase', freeDay: '¡Tienes el día libre!', addLessonsPrompt: 'Añade clases para organizar tu día.', studyOrRest: 'Tiempo para estudiar o descansar', ready: '¿Listo?' },
+				de: { language: 'Sprache', menu: 'Menü', mainNavigation: 'Hauptnavigation', mySchedule: 'Mein Stundenplan', homework: 'Hausaufgaben', studyPlan: 'Dein Lernplan', notifications: 'Benachrichtigungen aktivieren', addLesson: '+ Unterricht hinzufügen', coinBalance: 'Dein Münzguthaben', messages: 'Nachrichten', today: 'Heute', lessonsToday: 'Unterricht heute', lessonsDone: 'Abgeschlossene Stunden', activeHomework: 'Offene Aufgaben', weekSchedule: 'Wochenplan', editLessonHint: 'Unterricht zum Ändern der Zeit auswählen', homeworkTime: 'Hausaufgabenzeit', timersPersist: 'Timer laufen auch nach dem Schließen weiter', okay: 'OK', scheduleTitle: 'Wochenplan', lessonsTitle: 'Unterricht heute', lessonsCaption: 'Dein Unterricht nach Zeit sortiert', noLessons: 'Kein Unterricht', noLessonsToday: 'Heute kein Unterricht. Füge eine Stunde zu deinem Plan hinzu.', noHomework: 'Schließe eine Stunde ab, um hier Hausaufgabenzeit einzuplanen.', nextLesson: 'Nächste Stunde', freeDay: 'Du hast heute frei!', addLessonsPrompt: 'Füge Unterricht hinzu, um deinen Tag zu planen.', studyOrRest: 'Zeit zum Lernen oder Ausruhen', ready: 'Bereit?' },
+				tr: { language: 'Dil', menu: 'Menü', mainNavigation: 'Ana menü', mySchedule: 'Ders programım', homework: 'Ödevler', studyPlan: 'Çalışma planın', notifications: 'Bildirimleri aç', addLesson: '+ Ders ekle', coinBalance: 'Jeton bakiyen', messages: 'Mesajlar', today: 'Bugün', lessonsToday: 'Bugünkü dersler', lessonsDone: 'Tamamlanan dersler', activeHomework: 'Aktif ödevler', weekSchedule: 'Haftalık program', editLessonHint: 'Saatini düzenlemek için bir ders seç', homeworkTime: 'Ödev zamanı', timersPersist: 'Sayfayı kapatsan da sayaçlar çalışır', okay: 'Tamam', scheduleTitle: 'Haftalık program', lessonsTitle: 'Bugünkü dersler', lessonsCaption: 'Derslerin saate göre sıralandı', noLessons: 'Ders yok', noLessonsToday: 'Bugün ders yok. Programına ders ekle.', noHomework: 'Burada ödev zamanı ayarlamak için bir dersi tamamla.', nextLesson: 'Sıradaki ders', freeDay: 'Bugün boşsun!', addLessonsPrompt: 'Gününü düzenlemek için ders ekle.', studyOrRest: 'Ders veya dinlenme zamanı', ready: 'Hazır mısın?' },
+				ur: { language: 'زبان', menu: 'فہرست', mainNavigation: 'مرکزی نیویگیشن', mySchedule: 'میرا شیڈول', homework: 'ہوم ورک', studyPlan: 'آپ کا مطالعاتی منصوبہ', notifications: 'اطلاعات فعال کریں', addLesson: '+ سبق شامل کریں', coinBalance: 'آپ کے کوائنز', messages: 'پیغامات', today: 'آج', lessonsToday: 'آج کے اسباق', lessonsDone: 'مکمل اسباق', activeHomework: 'جاری ہوم ورک', weekSchedule: 'ہفتہ وار شیڈول', editLessonHint: 'وقت بدلنے کے لیے سبق منتخب کریں', homeworkTime: 'ہوم ورک کا وقت', timersPersist: 'صفحہ بند ہونے پر بھی ٹائمر چلتے رہتے ہیں', okay: 'ٹھیک ہے', scheduleTitle: 'ہفتہ وار شیڈول', lessonsTitle: 'آج کے اسباق', lessonsCaption: 'آپ کے اسباق وقت کے مطابق', noLessons: 'کوئی سبق نہیں', noLessonsToday: 'آج کوئی سبق نہیں۔ شیڈول بنانے کے لیے سبق شامل کریں۔', noHomework: 'یہاں ہوم ورک کا وقت مقرر کرنے کے لیے سبق مکمل کریں۔', nextLesson: 'اگلا سبق', freeDay: 'آج آپ فارغ ہیں!', addLessonsPrompt: 'اپنے دن کو ترتیب دینے کے لیے اسباق شامل کریں۔', studyOrRest: 'پڑھائی یا آرام کا وقت', ready: 'تیار؟' },
+				hi: { language: 'भाषा', menu: 'मेनू', mainNavigation: 'मुख्य नेविगेशन', mySchedule: 'मेरी समय-सारणी', homework: 'गृहकार्य', studyPlan: 'आपकी अध्ययन योजना', notifications: 'सूचनाएँ चालू करें', addLesson: '+ पाठ जोड़ें', coinBalance: 'आपके कॉइन', messages: 'संदेश', today: 'आज', lessonsToday: 'आज के पाठ', lessonsDone: 'पूरे किए पाठ', activeHomework: 'जारी गृहकार्य', weekSchedule: 'साप्ताहिक समय-सारणी', editLessonHint: 'समय बदलने के लिए पाठ चुनें', homeworkTime: 'गृहकार्य का समय', timersPersist: 'पेज बंद होने पर भी टाइमर चलते रहते हैं', okay: 'ठीक है', scheduleTitle: 'साप्ताहिक समय-सारणी', lessonsTitle: 'आज के पाठ', lessonsCaption: 'समय के अनुसार व्यवस्थित पाठ', noLessons: 'कोई पाठ नहीं', noLessonsToday: 'आज कोई पाठ नहीं है। अपनी समय-सारणी बनाने के लिए पाठ जोड़ें।', noHomework: 'यहाँ गृहकार्य का समय तय करने के लिए कोई पाठ पूरा करें।', nextLesson: 'अगला पाठ', freeDay: 'आज आपका दिन खाली है!', addLessonsPrompt: 'दिन व्यवस्थित करने के लिए पाठ जोड़ें।', studyOrRest: 'पढ़ाई या आराम का समय', ready: 'तैयार?' },
+				zh: { language: '语言', menu: '菜单', mainNavigation: '主导航', mySchedule: '我的课表', homework: '作业', studyPlan: '你的学习计划', notifications: '开启提醒', addLesson: '+ 添加课程', coinBalance: '你的金币余额', messages: '消息', today: '今天', lessonsToday: '今日课程', lessonsDone: '已完成课程', activeHomework: '进行中的作业', weekSchedule: '每周课表', editLessonHint: '选择课程以修改时间', homeworkTime: '作业时间', timersPersist: '关闭页面后计时器仍会继续', okay: '好的', scheduleTitle: '每周课表', lessonsTitle: '今日课程', lessonsCaption: '课程按时间排序', noLessons: '没有课程', noLessonsToday: '今天没有课程。添加课程以创建课表。', noHomework: '完成课程后，可在此安排作业时间。', nextLesson: '下一节课', freeDay: '今天没有安排！', addLessonsPrompt: '添加课程来安排你的一天。', studyOrRest: '学习或休息时间', ready: '准备好了吗？' },
+				ja: { language: '言語', menu: 'メニュー', mainNavigation: 'メインナビゲーション', mySchedule: 'マイスケジュール', homework: '宿題', studyPlan: '学習プラン', notifications: '通知を有効にする', addLesson: '+ 授業を追加', coinBalance: 'コイン残高', messages: 'メッセージ', today: '今日', lessonsToday: '今日の授業', lessonsDone: '完了した授業', activeHomework: '進行中の宿題', weekSchedule: '週間スケジュール', editLessonHint: '授業を選択して時間を編集', homeworkTime: '宿題の時間', timersPersist: 'ページを閉じてもタイマーは続きます', okay: 'OK', scheduleTitle: '週間スケジュール', lessonsTitle: '今日の授業', lessonsCaption: '授業を時間順に表示', noLessons: '授業はありません', noLessonsToday: '今日の授業はありません。授業を追加して予定を作成しましょう。', noHomework: '授業を完了すると、ここで宿題時間を設定できます。', nextLesson: '次の授業', freeDay: '今日は予定がありません！', addLessonsPrompt: '授業を追加して一日を計画しましょう。', studyOrRest: '勉強または休憩の時間', ready: '準備はいい？' }
+			};
+			const extraTranslations = {
+				noMessages: { ar: 'مفيش رسائل لسه. هتلاقي هنا مكافآتك وأي تفاصيل عن مواعيد الواجبات.', en: 'No messages yet. Rewards and homework updates will appear here.', fr: 'Aucun message. Vos récompenses et infos sur les devoirs apparaîtront ici.', es: 'Aún no hay mensajes. Aquí aparecerán tus recompensas y avisos de tareas.', de: 'Noch keine Nachrichten. Belohnungen und Aufgabeninfos erscheinen hier.', tr: 'Henüz mesaj yok. Ödüllerin ve ödev bilgilerin burada görünür.', ur: 'ابھی کوئی پیغام نہیں۔ انعامات اور ہوم ورک کی تفصیلات یہاں نظر آئیں گی۔', hi: 'अभी कोई संदेश नहीं। आपके पुरस्कार और गृहकार्य की जानकारी यहाँ दिखेगी।', zh: '暂时没有消息。奖励和作业信息会显示在这里。', ja: 'メッセージはありません。報酬や宿題のお知らせがここに表示されます。' },
+				rewardsDetails: { ar: 'مكافآتك وتفاصيل إنجازاتك.', en: 'Your rewards and achievement updates.', fr: 'Vos récompenses et vos réussites.', es: 'Tus recompensas y logros.', de: 'Deine Belohnungen und Erfolge.', tr: 'Ödüllerin ve başarıların.', ur: 'آپ کے انعامات اور کامیابیوں کی تفصیلات۔', hi: 'आपके पुरस्कार और उपलब्धियों का विवरण।', zh: '你的奖励和成就详情。', ja: '報酬と達成状況。' },
+				greeting: { ar: 'أهلاً يا', en: 'Hello,', fr: 'Bonjour,', es: 'Hola,', de: 'Hallo,', tr: 'Merhaba,', ur: 'خوش آمدید،', hi: 'नमस्ते,', zh: '你好，', ja: 'こんにちは、' },
+				student: { ar: 'بطل', en: 'there', fr: 'à vous', es: 'estudiante', de: 'Lernende:r', tr: 'öğrenci', ur: 'طالب علم', hi: 'विद्यार्थी', zh: '同学', ja: '学習者' },
+				studySpace: { ar: 'مساحة الدراسة', en: 'Study space', fr: 'Espace d’étude', es: 'Espacio de estudio', de: 'Lernbereich', tr: 'Çalışma alanı', ur: 'مطالعے کی جگہ', hi: 'अध्ययन स्थान', zh: '学习空间', ja: '学習スペース' },
+				remaining: { ar: 'فاضل', en: 'In', fr: 'Dans', es: 'Faltan', de: 'Noch', tr: 'Kalan', ur: 'باقی', hi: 'शेष', zh: '还有', ja: 'あと' },
+				minutesShort: { ar: 'د', en: 'min', fr: 'min', es: 'min', de: 'Min.', tr: 'dk', ur: 'منٹ', hi: 'मिनट', zh: '分钟', ja: '分' },
+				atTime: { ar: 'الساعة', en: 'At', fr: 'À', es: 'A las', de: 'Um', tr: 'Saat', ur: 'بجے', hi: 'बजे', zh: '时间', ja: '' }
+				,
+				lessonFinished: { ar: 'خلص الدرس', en: 'Lesson finished', fr: 'Cours terminé', es: 'Clase terminada', de: 'Unterricht beendet', tr: 'Ders tamamlandı', ur: 'سبق مکمل', hi: 'पाठ पूरा हुआ', zh: '课程已完成', ja: '授業完了' },
+				lessonNow: { ar: 'الدرس دلوقتي', en: 'In progress', fr: 'En cours', es: 'En curso', de: 'Läuft gerade', tr: 'Şu anda', ur: 'ابھی جاری ہے', hi: 'अभी चल रहा है', zh: '正在进行', ja: '授業中' },
+				completeOnLessonDay: { ar: 'الإنجاز متاح يوم الدرس', en: 'Complete on lesson day', fr: 'À terminer le jour du cours', es: 'Disponible el día de la clase', de: 'Am Unterrichtstag abschließen', tr: 'Ders günü tamamlanabilir', ur: 'سبق والے دن مکمل کریں', hi: 'पाठ के दिन पूरा करें', zh: '请在上课当天完成', ja: '授業日に完了できます' },
+				completed: { ar: 'تم الإنجاز', en: 'Completed', fr: 'Terminé', es: 'Completado', de: 'Erledigt', tr: 'Tamamlandı', ur: 'مکمل', hi: 'पूरा हुआ', zh: '已完成', ja: '完了' },
+				finishLesson: { ar: 'خلصت الدرس', en: 'Finish lesson', fr: 'Terminer le cours', es: 'Terminar clase', de: 'Unterricht abschließen', tr: 'Dersi bitir', ur: 'سبق مکمل کریں', hi: 'पाठ पूरा करें', zh: '完成课程', ja: '授業を完了' },
+				tomorrow: { ar: 'بكرة', en: 'Tomorrow', fr: 'Demain', es: 'Mañana', de: 'Morgen', tr: 'Yarın', ur: 'کل', hi: 'कल', zh: '明天', ja: '明日' },
+				minutes: { ar: 'دقيقة', en: 'min', fr: 'min', es: 'min', de: 'Min.', tr: 'dk', ur: 'منٹ', hi: 'मिनट', zh: '分钟', ja: '分' },
+				lessonStarted: { ar: 'بدأ الدرس، شد حيلك!', en: 'Your lesson has started. You’ve got this!', fr: 'Le cours a commencé. À vous de jouer !', es: 'La clase ha empezado. ¡Tú puedes!', de: 'Der Unterricht hat begonnen. Los geht’s!', tr: 'Ders başladı. Hadi başlayalım!', ur: 'سبق شروع ہو گیا، شروع کریں!', hi: 'पाठ शुरू हो गया है, चलिए!', zh: '课程开始了，加油！', ja: '授業が始まりました。頑張りましょう！' },
+				prepareLesson: { ar: 'جهّز نفسك قبل المعاد', en: 'Get ready before it starts', fr: 'Préparez-vous avant le début', es: 'Prepárate antes de empezar', de: 'Bereite dich rechtzeitig vor', tr: 'Başlamadan önce hazırlan', ur: 'وقت سے پہلے تیاری کریں', hi: 'शुरू होने से पहले तैयार हों', zh: '提前做好准备', ja: '始まる前に準備しましょう' },
+				finished: { ar: 'خلص', en: 'Done', fr: 'Terminé', es: 'Listo', de: 'Fertig', tr: 'Bitti', ur: 'مکمل', hi: 'पूरा', zh: '完成', ja: '完了' },
+				timeEnded: { ar: 'الوقت خلص', en: 'Time is up', fr: 'Temps écoulé', es: 'Se acabó el tiempo', de: 'Zeit abgelaufen', tr: 'Süre doldu', ur: 'وقت ختم', hi: 'समय पूरा हुआ', zh: '时间到', ja: '時間切れ' },
+				homeworkFor: { ar: 'واجب', en: 'Homework:', fr: 'Devoir :', es: 'Tarea:', de: 'Aufgabe:', tr: 'Ödev:', ur: 'ہوم ورک:', hi: 'गृहकार्य:', zh: '作业：', ja: '宿題：' },
+				homeworkCompleted: { ar: 'تم إنجاز الواجب', en: 'Homework completed', fr: 'Devoir terminé', es: 'Tarea completada', de: 'Aufgabe erledigt', tr: 'Ödev tamamlandı', ur: 'ہوم ورک مکمل', hi: 'गृहकार्य पूरा हुआ', zh: '作业已完成', ja: '宿題完了' },
+				started: { ar: 'بدأ', en: 'Started', fr: 'Commencé', es: 'Empezó', de: 'Gestartet', tr: 'Başlangıç', ur: 'شروع', hi: 'शुरू', zh: '开始于', ja: '開始' },
+				markDone: { ar: 'أنجزته', en: 'Done', fr: 'Terminé', es: 'Hecho', de: 'Erledigt', tr: 'Tamamlandı', ur: 'مکمل', hi: 'पूरा किया', zh: '已完成', ja: '完了' }
+			};
+			let language = Object.hasOwn(translations, localStorage.getItem('jadwali_language')) ? localStorage.getItem('jadwali_language') : 'ar';
+			const locale = () => ({ ar: 'ar-EG', ur: 'ur-PK', hi: 'hi-IN', zh: 'zh-CN', ja: 'ja-JP' }[language] || `${language}-${language.toUpperCase()}`);
+			let days = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(locale(), { weekday: 'long' }).format(new Date(2023, 0, 1 + index)));
 			const colors = ['#77a88e', '#df9673', '#7897ba', '#d3aa53', '#9b86b5'];
 			const read = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 			let lessons = read('jadwali_lessons', []);
@@ -275,9 +318,20 @@
 			};
 			const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 			const localDateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-			const dateLabel = new Intl.DateTimeFormat('ar-EG', { day: 'numeric', month: 'long' });
-			const timeLabel = (time) => new Intl.DateTimeFormat('ar-EG', { hour: 'numeric', minute: '2-digit' }).format(new Date(`2000-01-01T${time}:00`));
-			const toArabicNumber = (number) => new Intl.NumberFormat('ar-EG').format(number);
+			const dateLabel = (date) => new Intl.DateTimeFormat(locale(), { day: 'numeric', month: 'long' }).format(date);
+			const timeLabel = (time) => new Intl.DateTimeFormat(locale(), { hour: 'numeric', minute: '2-digit' }).format(new Date(`2000-01-01T${time}:00`));
+			const toArabicNumber = (number) => new Intl.NumberFormat(locale()).format(number);
+			const t = (key) => extraTranslations[key]?.[language] || translations[language][key] || translations.ar[key] || key;
+			function applyLanguage() {
+				const rtl = ['ar', 'ur'].includes(language);
+				document.documentElement.lang = language;
+				document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+				$('#language-select').value = language;
+				document.querySelectorAll('[data-i18n]').forEach((element) => { element.textContent = t(element.dataset.i18n); });
+				document.querySelectorAll('[data-i18n-aria]').forEach((element) => { element.setAttribute('aria-label', t(element.dataset.i18nAria)); });
+				$('#notifications').title = t('notifications');
+				days = Array.from({ length: 7 }, (_, index) => new Intl.DateTimeFormat(locale(), { weekday: 'long' }).format(new Date(2023, 0, 1 + index)));
+			}
 			const todayKey = () => localDateKey(new Date());
 			const formatDuration = (milliseconds) => {
 				const minutes = Math.max(1, Math.ceil(milliseconds / 60000));
@@ -289,20 +343,20 @@
 			const dayLessons = (day) => lessons.filter((lesson) => Number(lesson.day) === Number(day)).sort((a, b) => a.time.localeCompare(b.time));
 
 			function renderProfile() {
-				const name = user.name || user.email || 'طالب';
+				const name = user.name || user.email || t('student');
 				$('#profile-name').textContent = name;
-				$('#profile-note').textContent = user.purpose || 'مساحة الدراسة';
+				$('#profile-note').textContent = user.purpose || t('studySpace');
 				$('#avatar').innerHTML = user.avatar ? `<img src="${escapeHtml(user.avatar)}" alt="">` : escapeHtml(name.trim().charAt(0));
-				$('#greeting').textContent = `أهلاً يا ${user.name || 'بطل'}`;
+				$('#greeting').textContent = `${t('greeting')} ${user.name || t('student')}`;
 			}
 			renderProfile();
 
 			function renderDate() {
 				const now = new Date();
-				$('#today-date').textContent = dateLabel.format(now);
-				$('#today-name').textContent = new Intl.DateTimeFormat('ar-EG', { weekday: 'long', year: 'numeric' }).format(now);
-				$('#day-title').textContent = selectedDay === now.getDay() ? 'دروس اليوم' : `دروس ${days[selectedDay]}`;
-				$('#day-caption').textContent = selectedDay === now.getDay() ? 'مواعيدك مرتبة حسب الوقت' : `مواعيد يوم ${days[selectedDay]}`;
+				$('#today-date').textContent = dateLabel(now);
+				$('#today-name').textContent = new Intl.DateTimeFormat(locale(), { weekday: 'long', year: 'numeric' }).format(now);
+				$('#day-title').textContent = selectedDay === now.getDay() ? t('lessonsTitle') : `${t('lessonsTitle')} · ${days[selectedDay]}`;
+				$('#day-caption').textContent = selectedDay === now.getDay() ? t('lessonsCaption') : days[selectedDay];
 			}
 
 			function addMessage(title, body) {
@@ -317,8 +371,8 @@
 			}
 
 			function openMessages() {
-				const items = messages.length ? messages.map((message) => `<article class="message-item"><strong>${escapeHtml(message.title)}</strong><p>${escapeHtml(message.body)}</p><time>${new Intl.DateTimeFormat('ar-EG', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(message.createdAt))}</time></article>`).join('') : '<div class="empty-state">مفيش رسائل لسه. هتلاقي هنا مكافآتك وأي تفاصيل عن مواعيد الواجبات.</div>';
-				$('#modal-root').innerHTML = `<div class="overlay" id="modal-overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="messages-title"><h2 id="messages-title">رسائلك</h2><p>مكافآتك وتفاصيل إنجازاتك.</p><div class="message-list">${items}</div><div class="modal-actions"><button class="primary-button" id="close-messages" type="button">تمام</button></div></section></div>`;
+				const items = messages.length ? messages.map((message) => `<article class="message-item"><strong>${escapeHtml(message.title)}</strong><p>${escapeHtml(message.body)}</p><time>${new Intl.DateTimeFormat(locale(), { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(message.createdAt))}</time></article>`).join('') : `<div class="empty-state">${t('noMessages')}</div>`;
+				$('#modal-root').innerHTML = `<div class="overlay" id="modal-overlay"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="messages-title"><h2 id="messages-title">${t('messages')}</h2><p>${t('rewardsDetails')}</p><div class="message-list">${items}</div><div class="modal-actions"><button class="primary-button" id="close-messages" type="button">${t('okay')}</button></div></section></div>`;
 				$('#close-messages').addEventListener('click', closeModal);
 				$('#modal-overlay').addEventListener('click', (event) => { if (event.target.id === 'modal-overlay') closeModal(); });
 			}
@@ -330,7 +384,7 @@
 				$('#week-grid').innerHTML = days.map((day, index) => {
 					const entries = dayLessons(index);
 					const todayClass = index === new Date().getDay() ? 'today' : '';
-					return `<article class="day-column ${index === selectedDay ? 'selected' : ''} ${todayClass}" data-column="${index}"><div class="day-column-head"><span class="day-name">${day}</span><span class="day-count">${toArabicNumber(entries.length)}</span></div>${entries.length ? entries.map((lesson) => `<button class="lesson-chip" type="button" data-edit="${escapeHtml(lesson.id)}" style="--chip:${lesson.color || colors[0]}"><strong>${escapeHtml(lesson.title)}</strong><span>${timeLabel(lesson.time)}</span></button>`).join('') : '<div class="empty-day">مفيش دروس</div>'}</article>`;
+					return `<article class="day-column ${index === selectedDay ? 'selected' : ''} ${todayClass}" data-column="${index}"><div class="day-column-head"><span class="day-name">${day}</span><span class="day-count">${toArabicNumber(entries.length)}</span></div>${entries.length ? entries.map((lesson) => `<button class="lesson-chip" type="button" data-edit="${escapeHtml(lesson.id)}" style="--chip:${lesson.color || colors[0]}"><strong>${escapeHtml(lesson.title)}</strong><span>${timeLabel(lesson.time)}</span></button>`).join('') : `<div class="empty-day">${t('noLessons')}</div>`}</article>`;
 				}).join('');
 				$('#week-grid').querySelectorAll('[data-edit]').forEach((button) => button.addEventListener('click', () => openLessonModal(button.dataset.edit)));
 			}
@@ -338,7 +392,7 @@
 			function renderLessons() {
 				const entries = dayLessons(selectedDay);
 				if (!entries.length) {
-					$('#lesson-list').innerHTML = `<div class="empty-state">مفيش دروس في اليوم ده. اضغط «إضافة درس» وابدأ جدولك.</div>`;
+					$('#lesson-list').innerHTML = `<div class="empty-state">${t('noLessonsToday')}</div>`;
 					return;
 				}
 				$('#lesson-list').innerHTML = entries.map((lesson) => {
@@ -347,8 +401,8 @@
 					const isToday = selectedDay === now.getDay();
 					  const done = isToday && isDone(lesson);
 					const isCurrent = isToday && now >= lessonDate && now.getTime() < lessonDate.getTime() + lesson.duration * 60000;
-					const status = done ? '<span class="lesson-status done">خلص الدرس</span>' : isCurrent ? '<span class="lesson-status">الدرس دلوقتي</span>' : '';
-					  const actions = !isToday ? '<span class="lesson-status">الإنجاز متاح يوم الدرس</span>' : done ? `${status}<button class="finish-button" disabled type="button">تم الإنجاز</button>` : `${status}<button class="finish-button" data-finish="${escapeHtml(lesson.id)}" type="button">خلصت الدرس</button>`;
+					const status = done ? `<span class="lesson-status done">${t('lessonFinished')}</span>` : isCurrent ? `<span class="lesson-status">${t('lessonNow')}</span>` : '';
+					const actions = !isToday ? `<span class="lesson-status">${t('completeOnLessonDay')}</span>` : done ? `${status}<button class="finish-button" disabled type="button">${t('completed')}</button>` : `${status}<button class="finish-button" data-finish="${escapeHtml(lesson.id)}" type="button">${t('finishLesson')}</button>`;
 					  return `<article class="lesson-row" style="--row-color:${lesson.color || colors[0]}"><div class="lesson-time">${timeLabel(lesson.time)}</div><div class="lesson-main"><div class="lesson-title">${escapeHtml(lesson.title)}</div><div class="lesson-subtitle">${lesson.teacher ? `${escapeHtml(lesson.teacher)} · ` : ''}${toArabicNumber(lesson.duration)} دقيقة</div></div><div class="lesson-actions">${actions}</div></article>`;
 				}).join('');
 				$('#lesson-list').querySelectorAll('[data-finish]').forEach((button) => button.addEventListener('click', () => finishLesson(button.dataset.finish)));
@@ -367,15 +421,15 @@
 				}
 				candidates.sort((a, b) => a.at - b.at);
 				if (!candidates.length) {
-					$('#focus-card').innerHTML = '<div><div class="focus-label">الدرس القادم</div><div class="focus-title">يومك فاضي!</div><div class="focus-empty">ضيف دروسك وخلي كل حاجة في وقتها.</div></div><div class="focus-bottom"><span class="focus-meta">وقتك للمذاكرة أو الراحة</span><span class="countdown">جاهز؟</span></div>';
+					$('#focus-card').innerHTML = `<div><div class="focus-label">${t('nextLesson')}</div><div class="focus-title">${t('freeDay')}</div><div class="focus-empty">${t('addLessonsPrompt')}</div></div><div class="focus-bottom"><span class="focus-meta">${t('studyOrRest')}</span><span class="countdown">${t('ready')}</span></div>`;
 					return;
 				}
 				const { lesson, at, offset } = candidates[0];
 				const diff = at - now;
 				const remaining = Math.max(0, Math.ceil((at.getTime() + lesson.duration * 60000 - now.getTime()) / 60000));
-				const when = offset === 0 ? 'النهارده' : offset === 1 ? 'بكرة' : days[at.getDay()];
-				const countdown = diff <= 0 ? `فاضل ${toArabicNumber(remaining)} د` : diff < 3600000 ? `فاضل ${toArabicNumber(Math.ceil(diff / 60000))} د` : `الساعة ${timeLabel(lesson.time)}`;
-				$('#focus-card').innerHTML = `<div><div class="focus-label">الدرس القادم · ${when}</div><div class="focus-title">${escapeHtml(lesson.title)}</div><div class="focus-meta">${timeLabel(lesson.time)} · ${toArabicNumber(lesson.duration)} دقيقة</div></div><div class="focus-bottom"><span class="focus-meta">${offset === 0 && diff <= 0 ? 'بدأ الدرس، شد حيلك!' : 'جهّز نفسك قبل المعاد'}</span><span class="countdown">${countdown}</span></div>`;
+				const when = offset === 0 ? t('today') : offset === 1 ? t('tomorrow') : days[at.getDay()];
+				const countdown = diff <= 0 ? `${t('remaining')} ${toArabicNumber(remaining)} ${t('minutesShort')}` : diff < 3600000 ? `${t('remaining')} ${toArabicNumber(Math.ceil(diff / 60000))} ${t('minutesShort')}` : `${t('atTime')} ${timeLabel(lesson.time)}`;
+				$('#focus-card').innerHTML = `<div><div class="focus-label">${t('nextLesson')} · ${when}</div><div class="focus-title">${escapeHtml(lesson.title)}</div><div class="focus-meta">${timeLabel(lesson.time)} · ${toArabicNumber(lesson.duration)} ${t('minutes')}</div></div><div class="focus-bottom"><span class="focus-meta">${offset === 0 && diff <= 0 ? t('lessonStarted') : t('prepareLesson')}</span><span class="countdown">${countdown}</span></div>`;
 			}
 
 			function renderHomework() {
@@ -384,13 +438,13 @@
 				$('#stat-done').textContent = toArabicNumber(dayLessons(new Date().getDay()).filter((lesson) => isDone(lesson)).length);
 				$('#stat-homework').textContent = toArabicNumber(active.length);
 				if (!homework.length) {
-					$('#homework-list').innerHTML = '<div class="empty-state" style="grid-column:1/-1">لما تخلص درس، هنظبطلك وقت الواجب هنا.</div>';
+					$('#homework-list').innerHTML = `<div class="empty-state" style="grid-column:1/-1">${t('noHomework')}</div>`;
 					return;
 				}
 				$('#homework-list').innerHTML = homework.slice().reverse().map((task) => {
 					const seconds = Math.max(0, Math.ceil((task.endsAt - Date.now()) / 1000));
-					const timer = task.done ? 'خلص' : seconds > 0 ? `${toArabicNumber(Math.floor(seconds / 60))}:${String(seconds % 60).padStart(2, '0')}` : 'الوقت خلص';
-					return `<article class="homework-item ${task.done ? 'done' : ''}"><span class="task-mark"></span><div class="task-copy"><strong>واجب ${escapeHtml(task.title)}</strong><span>${task.done ? 'تم إنجاز الواجب' : `بدأ ${dateLabel.format(new Date(task.startedAt))}`}</span></div><span class="task-timer" data-timer="${escapeHtml(task.id)}">${timer}</span>${task.done ? '' : `<button class="task-complete" type="button" data-task="${escapeHtml(task.id)}">أنجزته</button>`}</article>`;
+					const timer = task.done ? t('finished') : seconds > 0 ? `${toArabicNumber(Math.floor(seconds / 60))}:${String(seconds % 60).padStart(2, '0')}` : t('timeEnded');
+					return `<article class="homework-item ${task.done ? 'done' : ''}"><span class="task-mark"></span><div class="task-copy"><strong>${t('homeworkFor')} ${escapeHtml(task.title)}</strong><span>${task.done ? t('homeworkCompleted') : `${t('started')} ${dateLabel(new Date(task.startedAt))}`}</span></div><span class="task-timer" data-timer="${escapeHtml(task.id)}">${timer}</span>${task.done ? '' : `<button class="task-complete" type="button" data-task="${escapeHtml(task.id)}">${t('markDone')}</button>`}</article>`;
 				}).join('');
 				$('#homework-list').querySelectorAll('[data-task]').forEach((button) => button.addEventListener('click', () => completeHomework(button.dataset.task)));
 			}
@@ -546,6 +600,14 @@
 			}
 
 			$('#add-lesson').addEventListener('click', () => openLessonModal());
+			$('#language-select').addEventListener('change', (event) => {
+				language = event.currentTarget.value;
+				localStorage.setItem('jadwali_language', language);
+				applyLanguage();
+				renderProfile();
+				closeModal();
+				render();
+			});
 			$('#open-messages').addEventListener('click', openMessages);
 			$('#edit-profile').addEventListener('click', openProfileModal);
 			$('#logout').addEventListener('click', () => { localStorage.removeItem('jadwali_user'); location.href = 'login.html'; });
@@ -558,6 +620,7 @@
 			$('#homework-nav').addEventListener('click', () => $('#homework-section').scrollIntoView({ behavior: 'smooth' }));
 			document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModal(); });
 			$('#reminder').classList.remove('show');
+			applyLanguage();
 			render();
 			checkReminders();
 			setInterval(() => { renderLessons(); renderHomework(); checkReminders(); }, 15000);
